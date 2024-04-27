@@ -70,40 +70,60 @@ export default class DoublyLinkedList<T> {
         while (curr && curr.value != item) {
             curr = curr.next;
         }
-        if (curr?.prev) {
-            let tmp = curr;
-            curr.prev.next = curr.next;
-            return curr.value;
+
+        if (!curr) {
+            return undefined;
+        }
+        this.length--;
+
+        if (this.length === 0) {
+            const out = this.head?.value;
+            this.head = this.tail = undefined;
+            return out;
         }
 
-        return undefined;
+        if (curr.prev) {
+            curr.prev.next = curr.next;
+        }
+
+        if (curr.next) {
+            curr.next.prev = curr.prev;
+        }
+
+        if (curr === this.head) {
+            this.head = curr.next;
+        }
+
+        if (curr === this.tail) {
+            this.tail = curr.prev;
+        }
+
+        curr.prev = curr.next = undefined;
+
+        return curr.value;
     }
     get(idx: number): T | undefined {
-        if (this.length === 0) {
-            return undefined;
-        }
-        let curr = this.head;
-        for (let i = 0; curr && i < idx; i++) {
-            curr = curr.next;
-        }
-        return curr?.value;
+        return this.getAt(idx)?.value;
     }
     removeAt(idx: number): T | undefined {
-        if (this.length === 0) {
+        const node = this.getAt(idx);
+        if (!node) {
             return undefined;
         }
-
-        let curr = this.head;
-        for (let i = 0; curr && i < idx; i++) {
-            curr = curr.next;
-        }
-
-        if (curr?.prev) {
-            let tmp = curr;
-            curr.prev.next = curr.next;
-            return curr.value;
+        if (node?.prev) {
+            let tmp = node;
+            node.prev.next = node.next;
+            return node.value;
         }
 
         return undefined;
+    }
+
+    private getAt(idx: number): Node<T> | undefined {
+        let curr = this.head;
+        for (let i = 0; i < idx; i++) {
+            curr = curr?.next;
+        }
+        return curr;
     }
 }
